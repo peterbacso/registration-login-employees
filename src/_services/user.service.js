@@ -27,6 +27,7 @@ function login(username, password, remember) {
             if (user.token && remember) {
                 // store user details and jwt token in local storage to keep user logged in between page refreshes
                 localStorage.setItem('user', JSON.stringify(user));
+                return user;
             } else {
                 let responseJson = {
                     id: user.id,
@@ -35,9 +36,8 @@ function login(username, password, remember) {
                     lastName: user.lastName,
                 };
                 localStorage.setItem('user', JSON.stringify(responseJson));
+                return responseJson;
             }
-
-            return user;
         });
 }
 
