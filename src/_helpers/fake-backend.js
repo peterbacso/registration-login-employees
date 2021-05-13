@@ -1,5 +1,13 @@
+import axios from "axios";
+
 // array in local storage for registered users
 let users = JSON.parse(localStorage.getItem('users')) || [];
+let employees = [];
+
+// axios.get("https://localhost:5001/employee/Employee")
+// .then(response => {
+//     employees = response.data;
+// })
     
 export function configureFakeBackend() {
     let realFetch = window.fetch;
@@ -41,7 +49,20 @@ export function configureFakeBackend() {
                 if (url.endsWith('/users') && opts.method === 'GET') {
                     // check for fake auth token in header and return users if valid, this security is implemented server side in a real application
                     if (opts.headers && opts.headers.Authorization === 'Bearer fake-jwt-token') {
-                        resolve({ ok: true, text: () => Promise.resolve(JSON.stringify(users))});
+                        axios.get("https://localhost:5001/employee/Employee")
+                        .then(response => {
+                            employees = response.data;
+                            resolve({ ok: true, text: () => Promise.resolve(JSON.stringify(employees))});
+                        })
+                        // resolve({ ok: true, text: () => 
+                        //     axios.get("https://localhost:5001/employee/Employee")
+                        //     .then(response => {
+                        //         return Promise.resolve(JSON.stringify(response.data))
+                        //     })
+                        //     .catch(e => {
+                        //         reject(e);
+                        //     })
+                        // });
                     } else {
                         // return 401 not authorised if token is null or invalid
                         reject('Unauthorised');
@@ -97,15 +118,22 @@ export function configureFakeBackend() {
                 if (url.match(/\/users\/\d+$/) && opts.method === 'DELETE') {
                     // check for fake auth token in header and return user if valid, this security is implemented server side in a real application
                     if (opts.headers && opts.headers.Authorization === 'Bearer fake-jwt-token') {
+                        console.log(employees)
                         // find user by id in users array
                         let urlParts = url.split('/');
                         let id = parseInt(urlParts[urlParts.length - 1]);
-                        for (let i = 0; i < users.length; i++) {
-                            let user = users[i];
-                            if (user.id === id) {
+                        axios.delete("https://localhost:5001/employee/Employee/" + id)
+                        .then((resp) => {
+                            console.log(resp);
+                        })
+                        .catch(e => {
+                            console.log(e)
+                        })
+                        for (let i = 0; i < employees.length; i++) {
+                            let employee = employees[i];
+                            if (employee.id === id) {
                                 // delete user
-                                users.splice(i, 1);
-                                localStorage.setItem('users', JSON.stringify(users));
+                                employees.splice(i, 1);
                                 break;
                             }
                         }
