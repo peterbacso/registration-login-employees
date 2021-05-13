@@ -24,9 +24,17 @@ function login(username, password, remember) {
             console.log('user', user)
             console.log('remember', remember)
             // login successful if there's a jwt token in the response
-            if (user.token) {
+            if (user.token && remember) {
                 // store user details and jwt token in local storage to keep user logged in between page refreshes
                 localStorage.setItem('user', JSON.stringify(user));
+            } else {
+                let responseJson = {
+                    id: user.id,
+                    username: user.username,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                };
+                localStorage.setItem('user', JSON.stringify(responseJson));
             }
 
             return user;
